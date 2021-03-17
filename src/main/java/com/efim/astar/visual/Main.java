@@ -10,11 +10,11 @@ public class Main {
         var filename = "astar-1";
 
         var input = new File("src/main/resources/%s.png".formatted(filename));
-        var output = new File("src/main/resources/%s-solution.png".formatted(filename));
+        var output = new File("src/main/resources/%s-solution-w100.png".formatted(filename));
 
         var start = System.nanoTime();
         var problem = new ProblemGeneratorFromPng().generate(input);
-        var solution = new AStar(0).solve(problem);
+        var solution = new AStar(100).solve(problem);
         new SolutionVisualiserToPng().visualise(output, problem, solution);
 
         System.out.println("Finished in %d ms. Result: %s".formatted(
