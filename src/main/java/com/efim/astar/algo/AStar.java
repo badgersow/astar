@@ -1,6 +1,7 @@
 package com.efim.astar.algo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
@@ -25,16 +26,17 @@ public class AStar implements SearchAlgorithm{
         var I = area.length;
         var J = area[0].length;
 
-        var frontier = new PriorityQueue<FrontierNode>();
+        var frontier = new PriorityQueue<>(Comparator.comparingInt(FrontierNode::weight));
         var minDistances = new HashMap<Point, Integer>();
         var backlinks = new HashMap<Point, Point>();
-        var visited = new boolean[I][J];
+        var wasInFrontier = new boolean[I][J];
         var found = false;
 
         frontier.add(new FrontierNode(0, problem.start()));
         minDistances.put(problem.start(), 0);
+        wasInFrontier[problem.start().i()][problem.start().j()] = true;
         while (!frontier.isEmpty()) {
-            var current = frontier.poll().point;
+            var current = frontier.remove().point;
 
             if (current.equals(problem.goal())) {
                 found = true;
@@ -42,14 +44,14 @@ public class AStar implements SearchAlgorithm{
             }
 
             expanded.add(current);
-            visited[current.i()][current.j()] = true;
 
             for (int[] diff : diffs) {
                 var adjI = current.i() + diff[0];
                 var adjJ = current.j() + diff[1];
                 var adjPoint = new Point(adjI, adjJ);
 
-                if (adjI < 0 || adjI >= I || adjJ < 0 || adjJ >= J || area[adjI][adjJ] == Cell.WALL || visited[adjI][adjJ]) {
+                if (adjI < 0 || adjI >= I || adjJ < 0 || adjJ >= J ||
+                        area[adjI][adjJ] == Cell.WALL || wasInFrontier[adjI][adjJ]) {
                     continue;
                 }
 
@@ -59,6 +61,7 @@ public class AStar implements SearchAlgorithm{
                 backlinks.put(adjPoint, current);
                 var adjWeight = adjDist + heuristicWeight * heuristic(adjPoint, problem.goal());
                 frontier.add(new FrontierNode(adjWeight, adjPoint));
+                wasInFrontier[adjI][adjJ] = true;
             }
         }
 
@@ -81,10 +84,6 @@ public class AStar implements SearchAlgorithm{
     private record FrontierNode (
             int weight,
             Point point
-    ) implements Comparable<FrontierNode>{
-        @Override
-        public int compareTo(FrontierNode other) {
-            return weight - other.weight;
-        }
+    ) {
     }
 }
