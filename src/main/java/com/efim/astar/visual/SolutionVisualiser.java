@@ -6,5 +6,5 @@ import com.efim.astar.algo.SearchSolution;
 import java.io.File;
 
 public interface SolutionVisualiser {
-    File visualise(SearchProblem problem, SearchSolution solution);
+    void visualise(File output, SearchProblem problem, SearchSolution solution);
 }

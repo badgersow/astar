@@ -18,7 +18,7 @@ public class GothicSearchAlgorithm implements SearchAlgorithm{
 
                 expanded.add(new Point(i, j));
                 if (Math.round((double) currentDiffI / diffI) ==
-                        (double) currentDiffJ / diffJ) {
+                        Math.round((double) currentDiffJ / diffJ)) {
                     path.add(new Point(i, j));
                 }
             }
