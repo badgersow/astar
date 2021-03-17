@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        var filename = "astar-2";
+        var filename = "astar-4";
         var weights = List.of(
                 new SearchParams("dijkstra", 1, 0),
                 new SearchParams("astar", 1, 1),
