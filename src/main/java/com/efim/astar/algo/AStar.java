@@ -14,7 +14,8 @@ public class AStar implements SearchAlgorithm{
     }
 
     private static int[][] diffs = new int[][]{
-            {0, 1}, {0, -1}, {1, 0}, {-1, 0}
+            {0, 1}, {0, -1}, {1, 0}, {-1, 0},
+            {1,1}, {1,-1}, {-1,1}, {-1,-1}
     };
 
     @Override
@@ -26,14 +27,14 @@ public class AStar implements SearchAlgorithm{
         var I = area.length;
         var J = area[0].length;
 
-        var frontier = new PriorityQueue<>(Comparator.comparingInt(FrontierNode::weight));
-        var minDistances = new HashMap<Point, Integer>();
+        var frontier = new PriorityQueue<>(Comparator.comparingDouble(FrontierNode::weight));
+        var minDistances = new HashMap<Point, Double>();
         var backlinks = new HashMap<Point, Point>();
         var wasInFrontier = new boolean[I][J];
         var found = false;
 
         frontier.add(new FrontierNode(0, problem.start()));
-        minDistances.put(problem.start(), 0);
+        minDistances.put(problem.start(), 0.0);
         wasInFrontier[problem.start().i()][problem.start().j()] = true;
         while (!frontier.isEmpty()) {
             var current = frontier.remove().point;
@@ -56,7 +57,7 @@ public class AStar implements SearchAlgorithm{
                 }
 
                 // Okay, now let's add this to the frontier
-                var adjDist = minDistances.get(current) + 1;
+                var adjDist = minDistances.get(current) + Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]);
                 minDistances.put(adjPoint, adjDist);
                 backlinks.put(adjPoint, current);
                 var adjWeight = adjDist + heuristicWeight * heuristic(adjPoint, problem.goal());
@@ -77,12 +78,12 @@ public class AStar implements SearchAlgorithm{
         return new SearchSolution(path, expanded);
     }
 
-    private int heuristic(Point current, Point goal) {
-        return current.manhattanTo(goal);
+    private double heuristic(Point current, Point goal) {
+        return current.euclidianTo(goal);
     }
 
     private record FrontierNode (
-            int weight,
+            double weight,
             Point point
     ) {
     }
