@@ -32,12 +32,10 @@ public class AStar implements SearchAlgorithm{
         var frontier = new PriorityQueue<>(Comparator.comparingDouble(FrontierNode::weight));
         var minDistances = new HashMap<Point, Double>();
         var backlinks = new HashMap<Point, Point>();
-        var wasInFrontier = new boolean[I][J];
         var cost = Double.POSITIVE_INFINITY;
 
         frontier.add(new FrontierNode(0, problem.start()));
         minDistances.put(problem.start(), 0.0);
-        wasInFrontier[problem.start().i()][problem.start().j()] = true;
         while (!frontier.isEmpty()) {
             var current = frontier.remove().point;
 
@@ -54,19 +52,23 @@ public class AStar implements SearchAlgorithm{
                 var adjPoint = new Point(adjI, adjJ);
 
                 if (adjI < 0 || adjI >= I || adjJ < 0 || adjJ >= J ||
-                        area[adjI][adjJ] == Cell.WALL || wasInFrontier[adjI][adjJ]) {
+                        area[adjI][adjJ] == Cell.WALL) {
+                    continue;
+                }
+
+                var adjDist = minDistances.get(current) + Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]);
+                // Let's see if we have found a better route
+                if (minDistances.containsKey(adjPoint) && minDistances.get(adjPoint) <= adjDist) {
                     continue;
                 }
 
                 // Okay, now let's add this to the frontier
-                var adjDist = minDistances.get(current) + Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]);
                 minDistances.put(adjPoint, adjDist);
                 backlinks.put(adjPoint, current);
                 var adjWeight =
                         distWeight * adjDist +
                                 heuristicWeight * heuristic(adjPoint, problem.goal());
                 frontier.add(new FrontierNode(adjWeight, adjPoint));
-                wasInFrontier[adjI][adjJ] = true;
             }
         }
 
