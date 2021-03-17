@@ -1,6 +1,6 @@
 package com.efim.astar.visual;
 
-import com.efim.astar.algo.GothicSearchAlgorithm;
+import com.efim.astar.algo.AStar;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +14,7 @@ public class Main {
 
         var start = System.nanoTime();
         var problem = new ProblemGeneratorFromPng().generate(input);
-        var solution = new GothicSearchAlgorithm().solve(problem);
+        var solution = new AStar(0).solve(problem);
         new SolutionVisualiserToPng().visualise(output, problem, solution);
 
         System.out.println("Finished in %d ms. Result: %s".formatted(

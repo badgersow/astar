@@ -6,7 +6,6 @@ import com.efim.astar.algo.SearchProblem;
 import com.efim.astar.algo.SearchSolution;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -28,9 +27,9 @@ public class SolutionVisualiserToPng implements SolutionVisualiser{
                     image.setRGB(j, i, Color.BLACK.getRGB());
                 } else {
                     var currentPoint = new Point(i, j);
-                    if (problem.start().inVicinity(currentPoint, 10)) {
+                    if (problem.start().inEuclideanVicinity(currentPoint, 10)) {
                         image.setRGB(j, i, Color.BLUE.getRGB());
-                    } else if (problem.goal().inVicinity(currentPoint, 10)) {
+                    } else if (problem.goal().inEuclideanVicinity(currentPoint, 10)) {
                         image.setRGB(j, i, Color.RED.getRGB());
                     } else if (pathSet.contains(currentPoint)) {
                         image.setRGB(j, i, Color.MAGENTA.getRGB());
