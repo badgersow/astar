@@ -7,13 +7,15 @@ import java.util.PriorityQueue;
 
 public class AStar implements SearchAlgorithm{
 
-    private int heuristicWeight;
+    private final double distWeight;
+    private final double heuristicWeight;
 
-    public AStar(int heuristicWeight) {
+    public AStar(double distWeight, double heuristicWeight) {
+        this.distWeight = distWeight;
         this.heuristicWeight = heuristicWeight;
     }
 
-    private static int[][] diffs = new int[][]{
+    private static final int[][] diffs = new int[][]{
             {0, 1}, {0, -1}, {1, 0}, {-1, 0},
             {1,1}, {1,-1}, {-1,1}, {-1,-1}
     };
@@ -31,7 +33,7 @@ public class AStar implements SearchAlgorithm{
         var minDistances = new HashMap<Point, Double>();
         var backlinks = new HashMap<Point, Point>();
         var wasInFrontier = new boolean[I][J];
-        var found = false;
+        var cost = Double.POSITIVE_INFINITY;
 
         frontier.add(new FrontierNode(0, problem.start()));
         minDistances.put(problem.start(), 0.0);
@@ -40,7 +42,7 @@ public class AStar implements SearchAlgorithm{
             var current = frontier.remove().point;
 
             if (current.equals(problem.goal())) {
-                found = true;
+                cost = minDistances.get(current);
                 break;
             }
 
@@ -60,13 +62,15 @@ public class AStar implements SearchAlgorithm{
                 var adjDist = minDistances.get(current) + Math.sqrt(diff[0] * diff[0] + diff[1] * diff[1]);
                 minDistances.put(adjPoint, adjDist);
                 backlinks.put(adjPoint, current);
-                var adjWeight = adjDist + heuristicWeight * heuristic(adjPoint, problem.goal());
+                var adjWeight =
+                        distWeight * adjDist +
+                                heuristicWeight * heuristic(adjPoint, problem.goal());
                 frontier.add(new FrontierNode(adjWeight, adjPoint));
                 wasInFrontier[adjI][adjJ] = true;
             }
         }
 
-        if (found) {
+        if (Double.isFinite(cost)) {
             // Let's unwind all backlinks
             var current = problem.goal();
             while (!current.equals(problem.start())) {
@@ -75,7 +79,7 @@ public class AStar implements SearchAlgorithm{
             }
         }
 
-        return new SearchSolution(path, expanded);
+        return new SearchSolution(cost, path, expanded);
     }
 
     private double heuristic(Point current, Point goal) {

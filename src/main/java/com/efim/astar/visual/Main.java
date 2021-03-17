@@ -8,22 +8,38 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        var filename = "astar-1";
-        var weights = List.of(0, 1, 2, 10);
+        var filename = "astar-2";
+        var weights = List.of(
+                new SearchParams("dijkstra", 1, 0),
+                new SearchParams("astar", 1, 1),
+                new SearchParams("astar2", 1, 2),
+                new SearchParams("astar5", 1, 5),
+                new SearchParams("greedy", 0, 1)
+        );
 
         var input = new File("src/main/resources/%s.png".formatted(filename));
         var problem = new ProblemGeneratorFromPng().generate(input);
 
-        for (Integer weight : weights) {
+        for (var params : weights) {
             var start = System.nanoTime();
-            var output = new File("src/main/resources/%s-solution-w%d.png".formatted(filename, weight));
-            var solution = new AStar(weight).solve(problem);
+            var output = new File("src/main/resources/%s-solution-%s.png".formatted(filename, params.name));
+            var solution = new AStar(params.distWeight, params.heuristicWeight).solve(problem);
             new SolutionVisualiserToPng().visualise(output, problem, solution);
-            System.out.println("Weight: %d. Finished in %d ms. Result: %s".formatted(
-                    weight,
+            System.out.printf(
+                    "Search: %s. Cost: %.3f. Finished in %d ms. Result: %s%n",
+                    params.name,
+                    solution.cost(),
                     TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start),
                     output.toURI()
-            ));
+            );
         }
     }
+
+    private record SearchParams(
+            String name,
+            double distWeight,
+            double heuristicWeight
+    ) {
+    }
+
 }

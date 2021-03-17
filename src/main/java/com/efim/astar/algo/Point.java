@@ -9,9 +9,7 @@ public record Point(
     }
 
     public boolean inEuclideanVicinity(Point other, int epsilon) {
-        return Math.sqrt(
-                (i - other.i) * (i - other.i) +
-                        (j - other.j) * (j - other.j)) <= epsilon;
+        return euclidianTo(other) <= epsilon;
     }
 
 }
