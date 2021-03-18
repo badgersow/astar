@@ -17,23 +17,27 @@ public class Main {
                 new SearchParams("greedy", 0, 1)
         );
 
+        var maxDistances = List.of(100, 300, 1000);
+
         var input = new File("src/main/resources/%s.png".formatted(filename));
         var problem = new ProblemGeneratorFromPng().generate(input);
 
         for (var params : weights) {
-            var start = System.nanoTime();
-            var solution = new AStar(params.distWeight, params.heuristicWeight).solve(problem);
-            var timeNanos = System.nanoTime() - start;
-            var output = new File("src/main/resources/%s-solution-%s.png".formatted(filename, params.name));
-            new SolutionVisualiserToPng().visualise(output, problem, solution);
-            System.out.printf(
-                    "Search: %s. Cost: %.3f. Expanded: %d. Time %d ms. Result: %s%n",
-                    params.name,
-                    solution.cost(),
-                    solution.expanded().size(),
-                    TimeUnit.NANOSECONDS.toMillis(timeNanos),
-                    output.toURI()
-            );
+            for (Integer maxDist : maxDistances) {
+                var start = System.nanoTime();
+                var solution = new AStar(params.distWeight, params.heuristicWeight, maxDist).solve(problem);
+                var timeNanos = System.nanoTime() - start;
+                var output = new File("src/main/resources/%s-solution-%s-%s.png".formatted(filename, params.name, maxDist));
+                new SolutionVisualiserToPng().visualise(output, problem, solution);
+                System.out.printf(
+                        "Search: %s. Cost: %.3f. Expanded: %d. Time %d ms. Result: %s%n",
+                        params.name,
+                        solution.cost(),
+                        solution.expanded().size(),
+                        TimeUnit.NANOSECONDS.toMillis(timeNanos),
+                        output.toURI()
+                );
+            }
         }
     }
 
