@@ -2,7 +2,13 @@ package com.efim.astar.visual;
 
 import com.efim.astar.algo.AStar;
 import com.efim.astar.algo.Point;
+import com.efim.astar.heuristic.ChebyshevDistance;
+import com.efim.astar.heuristic.DistanceWithoutObstacles;
 import com.efim.astar.heuristic.EuclideanDistance;
+import com.efim.astar.heuristic.GarbageDistance;
+import com.efim.astar.heuristic.InconsistentGarbageDistance;
+import com.efim.astar.heuristic.ManhattanDistance;
+import com.efim.astar.heuristic.RandomlyReducedEuclideanDistance;
 
 import java.io.File;
 import java.util.List;
@@ -15,12 +21,17 @@ public class Main {
         var allParams = List.of(
                 new SearchParams("astar", 1, 1),
                 new SearchParams("astar2", 1, 2),
-                new SearchParams("astar5", 1, 5),
                 new SearchParams("greedy", 0, 1)
         );
 
         var heuristics = List.of(
-                new HeuristicContainer("eucledian", new EuclideanDistance())
+                new HeuristicContainer("euclidean", new EuclideanDistance()),
+                new HeuristicContainer("manhattan", new ManhattanDistance()),
+                new HeuristicContainer("chebyshev", new ChebyshevDistance()),
+                new HeuristicContainer("without-obstacles", new DistanceWithoutObstacles()),
+                new HeuristicContainer("eucl-reduced", new RandomlyReducedEuclideanDistance()),
+                new HeuristicContainer("garbage", new GarbageDistance(540.345)),
+                new HeuristicContainer("inconsistentGarbage", new InconsistentGarbageDistance(540.345))
         );
 
         var input = new File("src/main/resources/%s.png".formatted(filename));
