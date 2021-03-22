@@ -4,17 +4,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.function.BiFunction;
 
 public class AStar implements SearchAlgorithm{
 
     private final double distWeight;
     private final double heuristicWeight;
-    private final int maxDistance;
+    private final BiFunction<Point, Point, Double> heuristic;
 
-    public AStar(double distWeight, double heuristicWeight, int maxDistance) {
+    public AStar(double distWeight, double heuristicWeight, BiFunction<Point, Point, Double> heuristic) {
         this.distWeight = distWeight;
         this.heuristicWeight = heuristicWeight;
-        this.maxDistance = maxDistance;
+        this.heuristic = heuristic;
     }
 
     private static final int[][] diffs = new int[][]{
@@ -40,10 +42,6 @@ public class AStar implements SearchAlgorithm{
         minDistances.put(problem.start(), 0.0);
         while (!frontier.isEmpty()) {
             var current = frontier.remove().point;
-
-            if (minDistances.get(current) > maxDistance) {
-                break;
-            }
 
             if (current.equals(problem.goal())) {
                 cost = minDistances.get(current);
@@ -73,7 +71,7 @@ public class AStar implements SearchAlgorithm{
                 backlinks.put(adjPoint, current);
                 var adjWeight =
                         distWeight * adjDist +
-                                heuristicWeight * heuristic(adjPoint, problem.goal());
+                                heuristicWeight * heuristic.apply(adjPoint, problem.goal());
                 frontier.add(new FrontierNode(adjWeight, adjPoint));
             }
         }
@@ -88,10 +86,6 @@ public class AStar implements SearchAlgorithm{
         }
 
         return new SearchSolution(cost, path, expanded);
-    }
-
-    private double heuristic(Point current, Point goal) {
-        return current.euclidianTo(goal);
     }
 
     private record FrontierNode (
